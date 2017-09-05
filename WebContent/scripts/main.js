@@ -1,98 +1,30 @@
-(function () {
+(function() {
 
 	/**
 	 * Variables
 	 */
-	var user_id       = '';
-	var user_fullname = '';
-	var lng           = -122.08;
-	var lat           = 37.38;
+	var user_id = '1111';
+	var lng = -122.08;
+	var lat = 37.38;
 
 	/**
 	 * Initialize
 	 */
 	function init() {
 		// Register event listeners
-		$('login-btn').addEventListener('click', login);
-		$('nearby-btn').addEventListener('click', loadNearbyRestaurants);
-		$('fav-btn').addEventListener('click', loadFavoriteRestaurants);
-		$('recommend-btn').addEventListener('click', loadRecommendedRestaurants);
-
-		// validateSession();
-
-		onSessionValid({
-			user_id: '1111',
-			name: 'John Smith'
-		});
-	}
-
-	/**
-	 * Session
-	 */
-	function validateSession() {
-		// The request parameters
-		var url = './LoginServlet';
-		var req = JSON.stringify({});
-
-		// display loading message
-		showLoadingMessage('Validating session...');
-
-		// make AJAX call
-		ajax('GET', url, req,
-				// session is still valid
-				function (res) {
-			var result = JSON.parse(res);
-
-			if (result.status === 'OK') {
-				onSessionValid(result);
-			}
-		}
-		);
-	}
-
-	function onSessionValid(result) {
-		user_id = result.user_id;
-		user_fullname = result.name;
-
-		var loginForm = $('login-form');
-		var restaurantNav = $('restaurant-nav');
-		var restaurantList = $('restaurant-list');
-		var avatar = $('avatar');
-		var welcomeMsg = $('welcome-msg');
-		var logoutBtn = $('logout-link');
-
-		welcomeMsg.innerHTML = 'Welcome, ' + user_fullname;
-
-		showElement(restaurantNav);
-		showElement(restaurantList);
-		showElement(avatar);
-		showElement(welcomeMsg);
-		showElement(logoutBtn, 'inline-block');
-		hideElement(loginForm);
+		$('nearby-btn').addEventListener('click', loadNearbyItems);
+		$('fav-btn').addEventListener('click', loadFavoriteItems);
+		$('recommend-btn').addEventListener('click', loadRecommendedItems);
 
 		initGeoLocation();
 	}
 
-	function onSessionInvalid() {
-		var loginForm = $('login-form');
-		var restaurantNav = $('restaurant-nav');
-		var restaurantList = $('restaurant-list');
-		var avatar = $('avatar');
-		var welcomeMsg = $('welcome-msg');
-		var logoutBtn = $('logout-link');
-
-		hideElement(restaurantNav);
-		hideElement(restaurantList);
-		hideElement(avatar);
-		hideElement(logoutBtn);
-		hideElement(welcomeMsg);
-
-		showElement(loginForm);
-	}
-
 	function initGeoLocation() {
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(onPositionUpdated, onLoadPositionFailed, {maximumAge: 60000});
+			navigator.geolocation.getCurrentPosition(onPositionUpdated,
+					onLoadPositionFailed, {
+				maximumAge : 60000
+			});
 			showLoadingMessage('Retrieving your location...');
 		} else {
 			onLoadPositionFailed();
@@ -103,12 +35,11 @@
 		lat = position.coords.latitude;
 		lng = position.coords.longitude;
 
-		loadNearbyRestaurants();
+		loadNearbyItems();
 	}
 
 	function onLoadPositionFailed() {
 		console.warn('navigator.geolocation is not available');
-		//loadNearbyRestaurants();
 		getLocationFromIP();
 	}
 
@@ -116,9 +47,7 @@
 		// Get location from http://ipinfo.io/json
 		var url = 'http://ipinfo.io/json'
 			var req = null;
-		ajax('GET', url, req,
-				// session is still valid
-				function (res) {
+		ajax('GET', url, req, function(res) {
 			var result = JSON.parse(res);
 			if ('loc' in result) {
 				var loc = result.loc.split(',');
@@ -127,58 +56,19 @@
 			} else {
 				console.warn('Getting location by IP failed.');
 			}
-			loadNearbyRestaurants();
-		}
-		);
+			loadNearbyItems();
+		});
 	}
 
-//	-----------------------------------
-//	Login
-//	-----------------------------------
-
-	function login() {
-		var username = $('username').value;
-		var password = $('password').value;
-		password = md5(username + md5(password));
-
-		//The request parameters
-		var url = './LoginServlet';
-		var params = 'user_id=' + username + '&password=' + password;
-		var req = JSON.stringify({});
-
-		ajax('POST', url + '?' + params, req,
-				// successful callback
-				function (res) {
-			var result = JSON.parse(res);
-
-			// successfully logged in
-			if (result.status === 'OK') {
-				onSessionValid(result);
-			}
-		},
-		// error
-		function () {
-			showLoginError();
-		}
-		);
-	}
-
-	function showLoginError() {
-		$('login-error').innerHTML = 'Invalid username or password';
-	}
-
-	function clearLoginError() {
-		$('login-error').innerHTML = '';
-	}
-
-//	-----------------------------------
-//	Helper Functions
-//	-----------------------------------
+	// -----------------------------------
+	// Helper Functions
+	// -----------------------------------
 
 	/**
 	 * A helper function that makes a navigation button active
 	 * 
-	 * @param btnId - The id of the navigation button
+	 * @param btnId -
+	 *            The id of the navigation button
 	 */
 	function activeBtn(btnId) {
 		var btns = document.getElementsByClassName('main-nav-btn');
@@ -194,18 +84,21 @@
 	}
 
 	function showLoadingMessage(msg) {
-		var restaurantList = $('restaurant-list');
-		restaurantList.innerHTML = '<p class="notice"><i class="fa fa-spinner fa-spin"></i> ' + msg + '</p>';
+		var itemList = $('item-list');
+		itemList.innerHTML = '<p class="notice"><i class="fa fa-spinner fa-spin"></i> '
+			+ msg + '</p>';
 	}
 
 	function showWarningMessage(msg) {
-		var restaurantList = $('restaurant-list');
-		restaurantList.innerHTML = '<p class="notice"><i class="fa fa-exclamation-triangle"></i> ' + msg + '</p>';
+		var itemList = $('item-list');
+		itemList.innerHTML = '<p class="notice"><i class="fa fa-exclamation-triangle"></i> '
+			+ msg + '</p>';
 	}
 
 	function showErrorMessage(msg) {
-		var restaurantList = $('restaurant-list');
-		restaurantList.innerHTML = '<p class="notice"><i class="fa fa-exclamation-circle"></i> ' + msg + '</p>';
+		var itemList = $('item-list');
+		itemList.innerHTML = '<p class="notice"><i class="fa fa-exclamation-circle"></i> '
+			+ msg + '</p>';
 	}
 
 	/**
@@ -222,7 +115,7 @@
 
 		var element = document.createElement(tag);
 
-		for (var option in options) {
+		for ( var option in options) {
 			if (options.hasOwnProperty(option)) {
 				element[option] = options[option];
 			}
@@ -231,29 +124,24 @@
 		return element;
 	}
 
-	function hideElement(element) {
-		element.style.display = 'none';
-	}
-
-	function showElement(element, style) {
-		var displayStyle = style ? style : 'block';
-		element.style.display = displayStyle;
-	}
-
 	/**
 	 * AJAX helper
 	 * 
-	 * @param method - GET|POST|PUT|DELETE
-	 * @param url - API end point
-	 * @param callback - This the successful callback
-	 * @param errorHandler - This is the failed callback
+	 * @param method -
+	 *            GET|POST|PUT|DELETE
+	 * @param url -
+	 *            API end point
+	 * @param callback -
+	 *            This the successful callback
+	 * @param errorHandler -
+	 *            This is the failed callback
 	 */
 	function ajax(method, url, data, callback, errorHandler) {
 		var xhr = new XMLHttpRequest();
 
 		xhr.open(method, url, true);
 
-		xhr.onload = function () {
+		xhr.onload = function() {
 			switch (xhr.status) {
 			case 200:
 				callback(xhr.responseText);
@@ -267,7 +155,7 @@
 			}
 		};
 
-		xhr.onerror = function () {
+		xhr.onerror = function() {
 			console.error("The request couldn't be completed.");
 			errorHandler();
 		};
@@ -275,57 +163,54 @@
 		if (data === null) {
 			xhr.send();
 		} else {
-			xhr.setRequestHeader("Content-Type", "application/json;charset=utf-8");
+			xhr.setRequestHeader("Content-Type",
+			"application/json;charset=utf-8");
 			xhr.send(data);
 		}
 	}
 
-//	-------------------------------------
-//	AJAX call server-side APIs
-//	-------------------------------------
+	// -------------------------------------
+	// AJAX call server-side APIs
+	// -------------------------------------
 
 	/**
-	 * API #1
-	 * Load the nearby restaurants
-	 * API end point: [GET] /Dashi/restaurants?user_id=1111&lat=37.38&lon=-122.08
+	 * API #1 Load the nearby items API end point: [GET]
+	 * /Titan/search?user_id=1111&lat=37.38&lon=-122.08
 	 */
-	function loadNearbyRestaurants() {
-		console.log('loadNearbyRestaurants');
+	function loadNearbyItems() {
+		console.log('loadNearbyItems');
 		activeBtn('nearby-btn');
 
 		// The request parameters
-		var url = './restaurants';
+		var url = './search';
 		var params = 'user_id=' + user_id + '&lat=' + lat + '&lon=' + lng;
 		var req = JSON.stringify({});
 
 		// display loading message
-		showLoadingMessage('Loading nearby restaurants...');
+		showLoadingMessage('Loading nearby items...');
 
 		// make AJAX call
-		ajax('GET', url + '?' + params, req, 
+		ajax('GET', url + '?' + params, req,
 				// successful callback
-				function (res) {
-			var restaurants = JSON.parse(res);
-			if (!restaurants || restaurants.length === 0) {
-				showWarningMessage('No nearby restaurant.');
+				function(res) {
+			var items = JSON.parse(res);
+			if (!items || items.length === 0) {
+				showWarningMessage('No nearby item.');
 			} else {
-				listRestaurants(restaurants);
+				listItems(items);
 			}
 		},
 		// failed callback
-		function () {
-			showErrorMessage('Cannot load nearby restaurants.');
-		}  
-		);
+		function() {
+			showErrorMessage('Cannot load nearby items.');
+		});
 	}
 
 	/**
-	 * API #2
-	 * Load favorite (or visited) restaurants
-	 * API end point: [GET] /Dashi/history?user_id=1111
+	 * API #2 Load favorite (or visited) items API end point: [GET]
+	 * /Titan/history?user_id=1111
 	 */
-	function loadFavoriteRestaurants(event) {
-		event.preventDefault();
+	function loadFavoriteItems() {
 		activeBtn('fav-btn');
 
 		// The request parameters
@@ -334,156 +219,178 @@
 		var req = JSON.stringify({});
 
 		// display loading message
-		showLoadingMessage('Loading favorite restaurants...');
+		showLoadingMessage('Loading favorite items...');
 
 		// make AJAX call
-		ajax('GET', url + '?' + params, req, 
-				function (res) {
-			var restaurants = JSON.parse(res);
-			if (!restaurants || restaurants.length === 0) {
-				showWarningMessage('No favorite restaurant.');
+		ajax('GET', url + '?' + params, req, function(res) {
+			var items = JSON.parse(res);
+			if (!items || items.length === 0) {
+				showWarningMessage('No favorite item.');
 			} else {
-				listRestaurants(restaurants);
+				listItems(items);
 			}
-		},
-		function () {
-			showErrorMessage('Cannot load favorite restaurants.');
-		}  
-		);
+		}, function() {
+			showErrorMessage('Cannot load favorite items.');
+		});
 	}
 
 	/**
-	 * API #3
-	 * Load recommended restaurants
-	 * API end point: [GET] /Dashi/recommendation?user_id=1111
+	 * API #3 Load recommended items API end point: [GET]
+	 * /Titan/recommendation?user_id=1111
 	 */
-	function loadRecommendedRestaurants() {
+	function loadRecommendedItems() {
 		activeBtn('recommend-btn');
 
 		// The request parameters
 		var url = './recommendation';
-		var params = 'user_id=' + user_id;
+		var params = 'user_id=' + user_id + '&lat=' + lat + '&lon=' + lng;
+
 		var req = JSON.stringify({});
 
 		// display loading message
-		showLoadingMessage('Loading recommended restaurants...');
+		showLoadingMessage('Loading recommended items...');
 
 		// make AJAX call
-		ajax('GET', url + '?' + params, req,
+		ajax(
+				'GET',
+				url + '?' + params,
+				req,
 				// successful callback
-				function (res) {
-			var restaurants = JSON.parse(res);
-			if (!restaurants || restaurants.length === 0) {
-				showWarningMessage('No recommended restaurant. Make sure you have favorites.');
-			} else {
-				listRestaurants(restaurants);
-			}
-		},
-		// failed callback
-		function () {
-			showErrorMessage('Cannot load recommended restaurants.');
-		} 
-		);
+				function(res) {
+					var items = JSON.parse(res);
+					if (!items || items.length === 0) {
+						showWarningMessage('No recommended item. Make sure you have favorites.');
+					} else {
+						listItems(items);
+					}
+				},
+				// failed callback
+				function() {
+					showErrorMessage('Cannot load recommended items.');
+				});
 	}
 
 	/**
-	 * API #4
-	 * Toggle favorite (or visited) restaurants
+	 * API #4 Toggle favorite (or visited) items
 	 * 
-	 * @param business_id - The restaurant business id
+	 * @param item_id -
+	 *            The item business id
 	 * 
-	 * API end point: [POST]/[DELETE] /Dashi/history
-	 * request json data: { user_id: 1111, visited: [a_list_of_business_ids] }
+	 * API end point: [POST]/[DELETE] /Dashi/history request json data: {
+	 * user_id: 1111, visited: [a_list_of_business_ids] }
 	 */
-	function changeFavoriteRestaurant(business_id) {
-		// Check whether this restaurant has been visited or not
-		var li = $('restaurant-' + business_id);
-		var favIcon = $('fav-icon-' + business_id);
-		var isVisited = li.dataset.visited !== 'true';
+	function changeFavoriteItem(item_id) {
+		// Check whether this item has been visited or not
+		var li = $('item-' + item_id);
+		var favIcon = $('fav-icon-' + item_id);
+		var favorite = li.dataset.favorite !== 'true';
 
 		// The request parameters
 		var url = './history';
 		var req = JSON.stringify({
-			user_id: user_id,
-			visited: [business_id]
+			user_id : user_id,
+			favorite : [ item_id ]
 		});
-		var method = isVisited ? 'POST' : 'DELETE';
+		var method = favorite ? 'POST' : 'DELETE';
 
 		ajax(method, url, req,
 				// successful callback
-				function (res) {
+				function(res) {
 			var result = JSON.parse(res);
-			if (result.status === 'OK') {
-				li.dataset.visited = isVisited;
-				favIcon.className = isVisited ? 'fa fa-heart' : 'fa fa-heart-o';
+			if (result.result === 'SUCCESS') {
+				li.dataset.favorite = favorite;
+				favIcon.className = favorite ? 'fa fa-heart' : 'fa fa-heart-o';
 			}
-		}
-		);
+		});
 	}
 
-//	-------------------------------------
-//	Create restaurant list
-//	-------------------------------------
+	// -------------------------------------
+	// Create item list
+	// -------------------------------------
 
 	/**
-	 * List restaurants
+	 * List items
 	 * 
-	 * @param restaurants - An array of restaurant JSON objects
+	 * @param items -
+	 *            An array of item JSON objects
 	 */
-	function listRestaurants(restaurants) {
+	function listItems(items) {
 		// Clear the current results
-		var restaurantList = $('restaurant-list');
-		restaurantList.innerHTML = '';
+		var itemList = $('item-list');
+		itemList.innerHTML = '';
 
-		for (var i = 0; i < restaurants.length; i++) {
-			addRestaurant(restaurantList, restaurants[i]);
+		for (var i = 0; i < items.length; i++) {
+			addItem(itemList, items[i]);
 		}
 	}
 
 	/**
-	 * Add restaurant to the list
+	 * Add item to the list
 	 * 
-	 * @param restaurantList - The <ul id="restaurant-list"> tag
-	 * @param restaurant - The restaurant data (JSON object)
+	 * @param itemList -
+	 *            The
+	 *            <ul id="item-list">
+	 *            tag
+	 * @param item -
+	 *            The item data (JSON object)
 	 */
-	function addRestaurant(restaurantList, restaurant) {
-		var business_id = restaurant.business_id;
+	function addItem(itemList, item) {
+		var item_id = item.item_id;
 
 		// create the <li> tag and specify the id and class attributes
 		var li = $('li', {
-			id: 'restaurant-' + business_id,
-			className: 'restaurant'
+			id : 'item-' + item_id,
+			className : 'item'
 		});
 
 		// set the data attribute
-		li.dataset.business = business_id;
-		li.dataset.visited = restaurant.is_visited;
+		li.dataset.item_id = item_id;
+		li.dataset.favorite = item.favorite;
 
-		// restaurant image
-		li.appendChild($('img', {src: restaurant.image_url}));
-
+		// item image
+		if (item.image_url) {
+			li.appendChild($('img', {
+				src : item.image_url
+			}));
+		} else {
+			li.appendChild($('img', {
+				src : 'https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png'
+			}))
+		}
 		// section
 		var section = $('div', {});
 
 		// title
-		var title = $('a', {href: restaurant.url, target: '_blank', className: 'restaurant-name'});
-		title.innerHTML = restaurant.name;
+		var title = $('a', {
+			href : item.url,
+			target : '_blank',
+			className : 'item-name'
+		});
+		title.innerHTML = item.name;
 		section.appendChild(title);
 
 		// category
-		var category = $('p', {className: 'restaurant-category'});
-		category.innerHTML = 'Category: ' + restaurant.categories.join(', ');
+		var category = $('p', {
+			className : 'item-category'
+		});
+		category.innerHTML = 'Category: ' + item.categories.join(', ');
 		section.appendChild(category);
 
-		// stars
-		var stars = $('div', {className: 'stars'});
-		for (var i = 0; i < restaurant.stars; i++) {
-			var star = $('i', {className: 'fa fa-star'});
+		var stars = $('div', {
+			className : 'stars'
+		});
+
+		for (var i = 0; i < item.rating; i++) {
+			var star = $('i', {
+				className : 'fa fa-star'
+			});
 			stars.appendChild(star);
 		}
 
-		if (('' + restaurant.stars).match(/\.5$/)) {
-			stars.appendChild($('i', {className: 'fa fa-star-half-o'}));
+		if (('' + item.rating).match(/\.5$/)) {
+			stars.appendChild($('i', {
+				className : 'fa fa-star-half-o'
+			}));
 		}
 
 		section.appendChild(stars);
@@ -491,26 +398,31 @@
 		li.appendChild(section);
 
 		// address
-		var address = $('p', {className: 'restaurant-address'});
+		var address = $('p', {
+			className : 'item-address'
+		});
 
-		address.innerHTML = restaurant.full_address.replace(/,/g, '<br/>');
+		address.innerHTML = item.address.replace(/,/g, '<br/>').replace(/\"/g,
+		'');
 		li.appendChild(address);
 
 		// favorite link
-		var favLink = $('p', {className: 'fav-link'});
+		var favLink = $('p', {
+			className : 'fav-link'
+		});
 
-		favLink.onclick = function () {
-			changeFavoriteRestaurant(business_id);
+		favLink.onclick = function() {
+			changeFavoriteItem(item_id);
 		};
 
 		favLink.appendChild($('i', {
-			id: 'fav-icon-' + business_id,
-			className: restaurant.is_visited ? 'fa fa-heart' : 'fa fa-heart-o'
+			id : 'fav-icon-' + item_id,
+			className : item.favorite ? 'fa fa-heart' : 'fa fa-heart-o'
 		}));
 
 		li.appendChild(favLink);
 
-		restaurantList.appendChild(li);
+		itemList.appendChild(li);
 	}
 
 	init();

@@ -2,9 +2,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="Restaurant Recommendation">
+<meta name="description" content="Item Recommendation">
 <meta name="author" content="Your Name">
-<title>Restaurant Recommendation Final</title>
+<title>Item Recommendation Final</title>
 <link
 	href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700'
 	rel='stylesheet' type='text/css'>
@@ -15,32 +15,23 @@
 <body>
 	<header class="top-header">
 		<nav class="top-nav">
-			<a href="#">Home</a> <a href="#">Contact</a> <a href="#">About</a>
+			<a href="#">Home</a> <a href="#">Contact</a> <a href="http://www.albertyihaoyang.com/">About</a>
 		</nav>
-		<span id="welcome-msg"></span> <a id="logout-link"
-			href="LogoutServlet">Logout</a> <i id="avatar"
-			class="avatar fa fa-user fa-2x"></i>
+		<span id="welcome-msg"></span>
 	</header>
 
 	<div class="container">
 		<header>
 			<p>
-				<span>Restaurant</span> <br /> Recommendation
+				<span>Item</span> <br /> Recommendation
 			</p>
 		</header>
 
 		<section class="main-section">
-			<div id="login-form">
-				<label for="username">Username:</label> <input id="username"
-					name="username" type="text"> <label for="password">Password:</label>
-				<input id="password" name="password" type="password">
-				<button id="login-btn">Login</button>
-				<p id="login-error"></p>
-			</div>
 
-			<aside id="restaurant-nav">
+			<aside id="item-nav">
 				<div class="nav-icon">
-					<i class="fa fa-cutlery fa-2x"></i>
+					<i class="fa fa-sitemap fa-2x"></i>
 				</div>
 				<nav class="main-nav">
 					<a href="#" id="nearby-btn" class="main-nav-btn active"> <i
@@ -53,18 +44,18 @@
 				</nav>
 			</aside>
 
-			<ul id="restaurant-list">
-				<li class="restaurant"><img alt="restaurant image"
+			<ul id="item-list">
+				<li class="item"><img alt="item image"
 					src="https://s3-media3.fl.yelpcdn.com/bphoto/EmBj4qlyQaGd9Q4oXEhEeQ/ms.jpg" />
 					<div>
-						<a class="restaurant-name" href="#">Restaurant</a>
-						<p class="restaurant-category">Vegetarian</p>
+						<a class="item-name" href="#">{item_name}</a>
+						<p class="item-category">Vegetarian</p>
 						<div class="stars">
 							<i class="fa fa-star"></i> <i class="fa fa-star"></i> <i
 								class="fa fa-star"></i>
 						</div>
 					</div>
-					<p class="restaurant-address">
+					<p class="item-address">
 						699 Calderon Ave<br />Mountain View<br /> CA
 					</p>
 					<div class="fav-link">
@@ -76,30 +67,28 @@
 
 	<footer>
 		<p class="title">What We Do</p>
-		<p>"Help you find the best restaurant around."</p>
+		<p>"Help you find the best place around."</p>
 		<ul>
 			<li>
 				<p>
 					<i class="fa fa-map-o fa-2x"></i>
 				</p>
-				<p>LaiOffer office, CA</p>
+				<p><a href = "https://www.google.com/maps/place/The+Lorenzo/@34.0283662,-118.275328,17z/data=!3m1!4b1!4m5!3m4!1s0x80c2c7dd25439f1f:0x325116afdbfd6d29!8m2!3d34.0283618!4d-118.2731393">Los Angeles, CA</a></p>
 			</li>
 			<li>
 				<p>
 					<i class="fa fa-envelope-o fa-2x"></i>
 				</p>
-				<p>info@laioffer.com</p>
+				<p><a href = "mailto: yihaoyan@usc.edu">yihaoyan@usc.edu</a></p>
 			</li>
 			<li>
 				<p>
 					<i class="fa fa-phone fa-2x"></i>
 				</p>
-				<p>+1 800 123 456</p>
+				<p>+1 (213) 204 - 0284</p>
 			</li>
 		</ul>
 	</footer>
-
-	<script src="https://rawgit.com/emn178/js-md5/master/build/md5.min.js"></script>
 	<script src="scripts/main.js"></script>
 </body>
 </html>
