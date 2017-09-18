@@ -1,6 +1,7 @@
 package db.mysql;
 
 public class MySQLDBUtil {
+//	private static final String HOSTNAME = "test-mysql";
 	private static final String HOSTNAME = "localhost";
 	private static final String PORT_NUM = "3306"; // change it to your mysql port number
 	public static final String DB_NAME = "laiproject";
