@@ -1,4 +1,4 @@
-# Titan
+# EventPlus
 - Developed a dynamic web page for users to search events and update preference.
 - Created Java servlets with RESTful APIs to handle HTTP requests and responses.
 - Built relational and NoSQL databases (MySQL, MongoDB) to fetch event data from TicketMaster API
